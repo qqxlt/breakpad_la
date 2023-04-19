@@ -43,10 +43,10 @@
 #include "common/using_std_string.h"
 #include "google_breakpad/common/minidump_format.h"
 
-#if !defined(__ARM_EABI__) && !defined(__mips__) && !defined(__riscv)
+#if !defined(__ARM_EABI__) && !defined(__mips__) && !defined(__riscv) && !defined(__loongarch64)
 // FP state is not part of user ABI for Linux ARM.
 // In case of MIPS and RISCV Linux FP state is already part of ucontext_t
-// so 'float_state' is not required.
+// so 'float_state' is not required. It's same as loongarch64.
 # define GOOGLE_BREAKPAD_CRASH_CONTEXT_HAS_FLOAT_STATE 1
 #else
 # define GOOGLE_BREAKPAD_CRASH_CONTEXT_HAS_FLOAT_STATE 0

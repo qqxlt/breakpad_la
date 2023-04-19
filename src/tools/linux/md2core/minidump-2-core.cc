@@ -82,6 +82,8 @@
   #define ELF_ARCH  EM_AARCH64
 #elif defined(__riscv)
   #define ELF_ARCH  EM_RISCV
+#elif defined(__loongarch64)
+  #define ELF_ARCH  EM_LOONGARCH
 #endif
 
 #if defined(__arm__)
@@ -264,7 +266,7 @@ typedef struct prpsinfo {       /* Information about process                 */
   unsigned char  pr_zomb;       /* Zombie                                    */
   signed char    pr_nice;       /* Nice val                                  */
   unsigned long  pr_flag;       /* Flags                                     */
-#if defined(__x86_64__) || defined(__mips__) || defined(__riscv)
+#if defined(__x86_64__) || defined(__mips__) || defined(__riscv) || defined(__loongarch64)
   uint32_t       pr_uid;        /* User ID                                   */
   uint32_t       pr_gid;        /* Group ID                                  */
 #else
@@ -311,7 +313,7 @@ struct CrashedProcess {
 
   struct Thread {
     pid_t tid;
-#if defined(__mips__) || defined(__riscv)
+#if defined(__mips__) || defined(__riscv) || defined(__loongarch64)
     mcontext_t mcontext;
 #else
     user_regs_struct regs;
@@ -603,6 +605,17 @@ ParseThreadRegisters(CrashedProcess::Thread* thread,
 #  error "Unexpected __riscv_flen"
 # endif
 }
+#elif defined(__loongarch64)
+static void
+ParseThreadRegisters(CrashedProcess::Thread* thread,
+                     const MinidumpMemoryRange& range) {
+  const MDRawContextLOONGARCH64* rawregs = range.GetData<MDRawContextLOONGARCH64>(0);
+
+  for (int i = 0; i < MD_CONTEXT_LOONGARCH64_GPR_COUNT; ++i)
+    thread->mcontext.__gregs[i] = rawregs->iregs[i];
+
+  thread->mcontext.__pc = rawregs->csr_epc;
+}
 #else
 #error "This code has not been ported to your platform yet"
 #endif
@@ -708,6 +721,12 @@ ParseSystemInfo(const Options& options, CrashedProcess* crashinfo,
 # else
 #  error "Unexpected __riscv_xlen"
 # endif
+#elif defined(__loongarch64)
+  if (sysinfo->processor_architecture != MD_CPU_ARCHITECTURE_LOONGARCH64) {
+    fprintf(stderr,
+            "This version of minidump-2-core only supports Loongarch64.\n");
+    exit(1);
+  }
 #else
 #error "This code has not been ported to your platform yet"
 #endif
@@ -1018,6 +1037,8 @@ WriteThread(const Options& options, const CrashedProcess::Thread& thread,
   memcpy(&pr.pr_reg, &thread.mcontext.gregs, sizeof(user_regs_struct));
 #elif defined(__riscv)
   memcpy(&pr.pr_reg, &thread.mcontext.__gregs, sizeof(user_regs_struct));
+#elif defined(__loongarch64)
+  memcpy(&pr.pr_reg, thread.mcontext.__gregs, sizeof(user_regs_struct));
 #else
   memcpy(&pr.pr_reg, &thread.regs, sizeof(user_regs_struct));
 #endif

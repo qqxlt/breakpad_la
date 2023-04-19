@@ -43,6 +43,8 @@ typedef MDRawContextARM RawContextCPU;
 typedef MDRawContextARM64_Old RawContextCPU;
 #elif defined(__mips__)
 typedef MDRawContextMIPS RawContextCPU;
+#elif defined(__loongarch64)
+typedef MDRawContextLOONGARCH64 RawContextCPU;
 #elif defined(__riscv)
 # if __riscv_xlen == 32
 typedef MDRawContextRISCV RawContextCPU;
