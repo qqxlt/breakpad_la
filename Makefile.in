@@ -1250,7 +1250,7 @@ src_processor_stackwalker_mips_unittest_DEPENDENCIES =  \
 	src/libbreakpad.a $(am__DEPENDENCIES_2) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
 am_src_processor_stackwalker_loongarch64_unittest_OBJECTS = src/common/processor_stackwalker_loongarch64_unittest-test_assembler.$(OBJEXT) \
-	src/processor/stackwalker_riscv64_unittest-stackwalker_loongarch64_unittest.$(OBJEXT)
+	src/processor/stackwalker_loongarch64_unittest-stackwalker_loongarch64_unittest.$(OBJEXT)
 src_processor_stackwalker_loongarch64_unittest_OBJECTS =  \
 	$(am_src_processor_stackwalker_loongarch64_unittest_OBJECTS)
 src_processor_stackwalker_loongarch64_unittest_DEPENDENCIES =  \
